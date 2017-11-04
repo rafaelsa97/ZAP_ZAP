@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 # CABECALHO:
 # |tipo_da_msg || id_da_origem || id_do_destino || num_da_sequencia|
 
