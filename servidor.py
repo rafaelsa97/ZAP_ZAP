@@ -3,11 +3,11 @@
 
 import socket
 import struct
-import time
+import mtd_svr
 
 #Endereco IP e porto da comunicacao
 IP = ''
-PORTO = 51513
+PORTO = 51515
 
 #Criacao do socket
 serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -26,27 +26,21 @@ while 1:
 		break
 	else:
 		data = struct.unpack('!4H',data)
-		print data[0]
 		client.send(struct.pack('!4H',1,8,1,8))
 
 	# Recebe mensagens do cliente
 	while 1:
-		tipo = client.recv(2)
-		idf1 = client.recv(2)
-		idf2 = client.recv(2)
-		tam  = struct.unpack(client.recv(2))
-		#tam = struct.unpack('!c')
-
-		s_aux = struct.unpack('!s', data)
-		if not data:
-			print "Deu ruim"
+		header = client.recv(8)
+		header_unpacked = struct.unpack("!4H",header)
+		if(header_unpacked[0] == 4):
+			print "Falou cuzao"
 			break
+		mensagem = ""
+		for i in range(header_unpacked[3]):
+			a = struct.unpack('!B',client.recv(1))
+			mensagem = mensagem + str(chr(a[0]))
+		print mensagem
 
-		if s_aux[1] == '4':
-			print "Desconectou"
-			client.send(struct.pack('!i',1818))
-			break
-		else:
-			print data
-			client.send(struct.pack('!i',1818))
+		mtd_svr.ok(client,header_unpacked[1],header_unpacked[2])
+	client.send(struct.pack('!4H',1,8,1,8))
 	client.close

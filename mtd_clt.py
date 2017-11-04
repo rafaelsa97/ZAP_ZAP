@@ -11,7 +11,7 @@ def msg_OI(s):
         print "O programa nao pode obter o numero identificador com o servidor."
         return 0
     s_aux = struct.unpack('!4H',idf)
-    idf =  int(s_aux[1])
+    idf =  int(s_aux[2])
     # Confere se recebeu um ok do servidor
     print s_aux[0]
     if s_aux[0] == 1:

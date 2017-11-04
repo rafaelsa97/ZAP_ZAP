@@ -6,6 +6,7 @@
 import socket
 import struct
 import mtd_clt
+import select
 
 print "ZAP ZAP initiated"
 # Endereco de IP  e porto de comunicacao ouvido pelo cliente:
