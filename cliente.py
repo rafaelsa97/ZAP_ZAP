@@ -22,8 +22,9 @@ except:
     print "Não foi possível conectar ao servidor"
     sys.exit()
 # Obtem num. identificador com o servidor
-idf = mtd_clt.msg_OI(s)
+id_proprio = mtd_clt.msg_OI(s)
 while 1:
+    id_dest = 0
     # Função select
     socket_list = [sys.stdin, s]
     ready_to_read,ready_to_write,in_error = select.select(socket_list , [], [])
@@ -41,11 +42,14 @@ while 1:
         else :
             # Cliente envia mensagem
             mensagem = mtd_clt.recebe_mensagem()
+            if mensagem[0:7] == "CONECTA" and id_dest == 0:
+                id_dest = int(mensagem[8:])
+                mensagem = mtd_clt.recebe_mensagem()
             if mensagem == "FLW":
-                flw_result = mtd_clt.msg_FLW(idf,s)
+                flw_result = mtd_clt.msg_FLW(id_proprio,s,id_dest)
                 s.close
                 sys.exit()
-            if mensagem == "CREQ":
-                msg_CREQ(idf,s)
+            elif mensagem == "CREQ":
+                mtd_clt.msg_CREQ(id_proprio,s)
             else:
-                msg_result = mtd_clt.msg_MSG(mensagem,idf,s)
+                msg_result = mtd_clt.msg_MSG(mensagem,id_proprio,s,id_dest)
