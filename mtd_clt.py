@@ -20,7 +20,7 @@ def msg_OI(s):
             print "Cliente recebeu número de identificador igual ao do servidor"
             s.close
         print "Identificador: " + str(idf)
-        sys.stdout.write('-> '); sys.stdout.flush()
+        sys.stdout.write('-oi> '); sys.stdout.flush()
         return idf
     else:
         print "Falha na atribuicao de numero de identificador pelo servidor"
@@ -86,11 +86,11 @@ def msg_CREQ(idf,s):
 # Obtém a mensagem enviada pelo usuário através do terminal
 # Saida: mensagem digitada pelo usuário
 def recebe_mensagem():
-    buf = raw_input("-> ")
+    buf = raw_input("-msg> ")
     # Caso o stdin leia um enter, o enter "\n" é removido da string
     mensagem = buf.replace("\n","")
     # Controla o num. max. de caracteres da mensagem
     while len(mensagem) > 400:
         print "Atencao! Mensagem limitada a 400 caracteres.\nDigite novamente sua mensagem"
-        mensagem = raw_input("-> ")
+        mensagem = raw_input("-400> ")
     return mensagem
