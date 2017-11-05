@@ -1,5 +1,5 @@
 cliente:
-	python cliente.py mtd_clt.py 127.0.0.1 51515
+	python cliente.py mtd_clt.py 177.15.163.213 51515
 
 servidor:
 	python servidor.py mtd_svr.py

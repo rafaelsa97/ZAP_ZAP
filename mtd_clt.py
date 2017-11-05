@@ -53,7 +53,7 @@ def msg_FLW(idf,s):
     # Cria cabecalho
     tipo = 4
     idf_serv = 65535
-    tipo_idf = struct.pack('!4H', tipo, idf, idf_serv,69)
+    tipo_idf = struct.pack('!4H', tipo, idf, idf_serv,0)
     s.send(tipo_idf)
     ok = struct.unpack('!4H',s.recv(8))
     if ok[1] == '1':
