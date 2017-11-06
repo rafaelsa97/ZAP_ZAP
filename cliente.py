@@ -38,7 +38,7 @@ while 1:
             else :
                 #print data
                 sys.stdout.write(data)
-                sys.stdout.write('-vamo ve  r se aparece> '); sys.stdout.flush()
+                sys.stdout.write('-vamo ver se aparece> '); sys.stdout.flush()
         else :
             # Cliente envia mensagem
             mensagem = mtd_clt.recebe_mensagem()
@@ -46,6 +46,7 @@ while 1:
                 flw_result = mtd_clt.msg_FLW(id_proprio,s,id_dest)
                 s.close
                 sys.exit()
+                break
             elif mensagem == "CREQ":
                 mtd_clt.msg_CREQ(id_proprio,s)
             elif mensagem[0:7] == "CONECTA" and id_dest == 0:

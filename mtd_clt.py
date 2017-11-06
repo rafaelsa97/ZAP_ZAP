@@ -20,7 +20,7 @@ def msg_OI(s):
             print "Cliente recebeu número de identificador igual ao do servidor"
             s.close
         print "Identificador: " + str(idf)
-        sys.stdout.write('-oi> '); sys.stdout.flush()
+        sys.stdout.write('-> '); sys.stdout.flush()
         return idf
     else:
         print "Falha na atribuicao de numero de identificador pelo servidor"
@@ -40,10 +40,9 @@ def msg_MSG(msg, id_cliente, s, id_dest):
         s_aux = s_aux + struct.pack('!B',ord(i))
     s.send(tipo_idf + tam + s_aux)
     ok = struct.unpack('!4H',s.recv(8))
-    if ok[1] == '1':
-        return 1
-    elif ok[1] == '2':
-        return 0
+    while ok[0] != 1:
+        ok = struct.unpack('!4H',s.recv(8))
+    return 1
 
 # msg_FLW(identificador do cliente, socket ligado ao servidor)
 # Envia mensagem ao servidor informando saida
@@ -55,10 +54,9 @@ def msg_FLW(id_cliente,s,id_dest):
     tipo_idf = struct.pack('!4H', tipo, id_cliente, id_dest,0)
     s.send(tipo_idf)
     ok = struct.unpack('!4H',s.recv(8))
-    if ok[1] == '1':
-        return 1
-    else:
-        return 0
+    while ok[0] != 1:
+        ok = struct.unpack('!4H',s.recv(8))
+    return 1
 
 # msg_CREQ(identificador do cliente, socket ligado ao servidor)
 # Envia requisição para receber lista de clientes conectados ao servidor e os imprime na tela
@@ -86,11 +84,11 @@ def msg_CREQ(idf,s):
 # Obtém a mensagem enviada pelo usuário através do terminal
 # Saida: mensagem digitada pelo usuário
 def recebe_mensagem():
-    buf = raw_input("-msg> ")
+    buf = raw_input("-> ")
     # Caso o stdin leia um enter, o enter "\n" é removido da string
     mensagem = buf.replace("\n","")
     # Controla o num. max. de caracteres da mensagem
     while len(mensagem) > 400:
         print "Atencao! Mensagem limitada a 400 caracteres.\nDigite novamente sua mensagem"
-        mensagem = raw_input("-400> ")
+        mensagem = raw_input("-> ")
     return mensagem

@@ -6,7 +6,7 @@ import struct
 import mtd_svr
 
 #Endereco IP e porto da comunicacao
-IP = ''
+IP = '127.0.0.1'
 PORTO = 51515
 
 #Criacao do socket
