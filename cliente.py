@@ -31,13 +31,18 @@ while 1:
     for sock in ready_to_read:
         if sock == s:
             # Cliente recebe mensagem
-            data = sock.recv(4096)
+            data = sock.recv(8)
             if not data :
                 print 'Cliente desconectado'
                 sys.exit()
             else :
                 #print data
-                sys.stdout.write(data)
+                tipo, id_remet, id_dest, tam = struct.unpack('!4H', data)
+                mensagem = ""
+                for i in range(tam):
+                    byte = struct.unpacl('!B', s.recv(1))
+                    mensagem = mensagem + str(chr(byte[0]))
+                sys.stdout.write(mensagem)
                 sys.stdout.write('-vamo ver se aparece> '); sys.stdout.flush()
         else :
             # Cliente envia mensagem
