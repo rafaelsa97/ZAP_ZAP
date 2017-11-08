@@ -25,6 +25,7 @@ except:
 id_proprio = mtd_clt.msg_OI(s)
 while 1:
     id_dest = 0
+    continuar = 1
     # Função select
     socket_list = [sys.stdin, s]
     ready_to_read,ready_to_write,in_error = select.select(socket_list , [], [])
@@ -48,9 +49,9 @@ while 1:
             # Cliente envia mensagem
             mensagem = mtd_clt.recebe_mensagem()
             if mensagem == "FLW":
-                flw_result = mtd_clt.msg_FLW(id_proprio,s,id_dest)
+                flw_result, continuar = mtd_clt.msg_FLW(id_proprio,s,id_dest)
                 s.close
-                sys.exit()
+                sys.exit(0)
                 break
             elif mensagem == "CREQ":
                 mtd_clt.msg_CREQ(id_proprio,s)

@@ -10,7 +10,7 @@ def msg_OI(s):
     idf = s.recv(8)
     # Confere se mensagem de resposta foi recebida
     if not idf:
-        print "O programa nao pode obter o numero identificador com o servidor."
+        print "O programa não pôde obter o número identificador com o servidor."
         return 0
     s_aux = struct.unpack('!4H',idf)
     idf =  int(s_aux[2])
@@ -19,6 +19,7 @@ def msg_OI(s):
         if idf == 0:
             print "Cliente recebeu número de identificador igual ao do servidor"
             s.close
+            sys.exit()
         print "Identificador: " + str(idf)
         sys.stdout.write('-> '); sys.stdout.flush()
         return idf
@@ -56,7 +57,7 @@ def msg_FLW(id_cliente,s,id_dest):
     ok = struct.unpack('!4H',s.recv(8))
     while ok[0] != 1:
         ok = struct.unpack('!4H',s.recv(8))
-    return 1
+    return 1, 0
 
 # msg_CREQ(identificador do cliente, socket ligado ao servidor)
 # Envia requisição para receber lista de clientes conectados ao servidor e os imprime na tela
@@ -85,10 +86,10 @@ def msg_CREQ(idf,s):
 # Saida: mensagem digitada pelo usuário
 def recebe_mensagem():
     buf = raw_input("-> ")
+    # Controla o num. max. de caracteres da mensagem
+    while len(buf) > 400:
+        print "Atencao! Mensagem limitada a 400 caracteres.\nDigite novamente sua mensagem"
+        buf = raw_input("-> ")
     # Caso o stdin leia um enter, o enter "\n" é removido da string
     mensagem = buf.replace("\n","")
-    # Controla o num. max. de caracteres da mensagem
-    while len(mensagem) > 400:
-        print "Atencao! Mensagem limitada a 400 caracteres.\nDigite novamente sua mensagem"
-        mensagem = raw_input("-> ")
     return mensagem
