@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #TP0 REDES - RAFAEL SANTOS DE ALMEIDA - 2015123614
 #ENGENHARIA DE CONTROLE E AUTOMACAO - UFMG
 
@@ -13,7 +14,7 @@ PORTO = 51513
 
 SOCKET_LIST = []
 RECV_BUFFER = 4096
-LISTA_ID = [] 
+LISTA_ID = []
 server_id = 65535
 
 #Criacao do socket
@@ -52,52 +53,59 @@ while 1:
                                                 mtd_svr.ok(client,server_id,new_client_id)
 
                 else:
-                          # process data recieved from client, 
+                          # process data recieved from client,
                     try:
-                        # receiving data from the socket.                    
-                        data = sock.recv(8)
+                        # receiving data from the socket.
+                        data = sock.recv(10)
                         if data:
                             msg = ''
-                            tipo,id_remet,id_dest,tam = struct.unpack("!4H",data)
+                            tipo,id_remet,id_dest,ordem,tam = struct.unpack("!5H",data)
                             for i in range(tam):
                                 byte = struct.unpack('!B',sock.recv(1))
                                 msg = msg + str(chr(byte[0]))
-                            print tipo,id_remet,id_dest,tam,msg
+                            print tipo,id_remet,id_dest,ordem,tam,msg
 
                             #Mensagem de CREQ
                             if tipo == 6:
+                                print "entrou no tipo CREQ"
                                 mtd_svr.clist(sock,server_id,id_remet,SOCKET_LIST)
                                 tipo,id_remet,id_dest,nothing = struct.unpack('!4H',sock.recv(8))
                                 print tipo,id_remet,id_dest,nothing
-                                if tipo == 2:
+                                if tipo == 2: # Se tiver erro...
                                     print "ERROR 404"
 
                             #Mensagem para outro
-
                             if tipo == 5:
+                                print "entrou no tipo MSG"
                                 mtd_svr.ok(sock,server_id,id_remet)
-                                if id_dest == 0:
+                                if id_dest == 0: #Broadcast
+                                    # Empacota o payload
+                                    s_aux = ""
+                                    for c in msg:
+                                        s_aux = s_aux + struct.pack('!B',ord(i))
+                                    print s_aux
                                     for i in SOCKET_LIST:
-                                        i.send(data)
-                                        mtd_svr.ok(sock,65535,id_remet)
+                                        print "testem"
+                                        i.send(data + s_aux)
+                                        ok = client.recv(8)
                                         print "JKJAKLSDJAKLSFS"
                                         error = False
-        
                                 else:
                                     dest =  procuraSock(id_dest,lista_socket)
                                     print "Socket destino: " + str(dest)
                                     if dest:
                                         dest.send(data)
-                                        ok(remet,65535,id_remet)
+                                        mtd_svr.ok(remet,65535,id_remet)
                                         error = False
                                 print error
 
                             #Mensagem de FLW
                             if tipo == 4:
+                                print "entrou no tipo FLW"
                                 if sock in SOCKET_LIST:
                                     mtd_svr.ok(sock,server_id,id_remet)
                                     mtd_svr.fecharSocket(sock,SOCKET_LIST)
-                                    
+
 
 
                     except:

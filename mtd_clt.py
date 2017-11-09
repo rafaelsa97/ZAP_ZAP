@@ -33,7 +33,7 @@ def msg_OI(s):
 def msg_MSG(msg, id_cliente, s, id_dest):
     # Cria cabecalho
     tipo = 5
-    tipo_idf = struct.pack('!3H', tipo, id_cliente, id_dest)
+    tipo_idf = struct.pack('!4H', tipo, id_cliente, id_dest,0)
     # Encapsulamento do tamanho da mensagem
     tam = struct.pack('!H',len(msg))
     s_aux = ""
@@ -51,7 +51,6 @@ def msg_MSG(msg, id_cliente, s, id_dest):
 def msg_FLW(id_cliente,s,id_dest):
     # Cria cabecalho
     tipo = 4
-    idf_serv = 65535
     tipo_idf = struct.pack('!4H', tipo, id_cliente, id_dest,0)
     s.send(tipo_idf)
     ok = struct.unpack('!4H',s.recv(8))
@@ -66,9 +65,10 @@ def msg_CREQ(idf,s):
     # Cria cabecalho
     tipo_CREQ = 6
     idf_serv = 65535
+    # Envia requisição da lista:
     cabec = struct.pack('!4H', tipo_CREQ, idf, idf_serv,0)
     s.send(cabec)
-    buf = s.recv(10)
+    buf = s.recv(10) # Recebe cabec + tamanho da lista de clientes
     if buf:
         tipo, idf_org, idf_dst, num_seq, tam_lista = struct.unpack('!5H',buf)
         print "---------- LISTA DE CLIENTES ----------"
@@ -81,10 +81,10 @@ def msg_CREQ(idf,s):
         # Envia uma mensagem de erro ao servidor
         s.send(struct.pack('!4H',2,idf,idf_serv,0))
 
-# recebe_mensagem()
+# digita_mensagem()
 # Obtém a mensagem enviada pelo usuário através do terminal
 # Saida: mensagem digitada pelo usuário
-def recebe_mensagem():
+def digita_mensagem():
     buf = raw_input("-> ")
     # Controla o num. max. de caracteres da mensagem
     while len(buf) > 400:
