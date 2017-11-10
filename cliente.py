@@ -19,12 +19,12 @@ id_dest  = 65535 # Número de identificador do destinatário
 s = mtd_clt.cria_socket_e_conecta(IP,PORTO)
 # Obtem num. identificador com o servidor
 id_proprio = mtd_clt.msg_OI(s)
+num_seq = 0 # Número de sequência das mensagens
 while 1:
     # Função select:
     socket_list = [sys.stdin, s]
     ready_to_read,ready_to_write,in_error = select.select(socket_list , [], [])
     for sock in ready_to_read:
-        print "Será que volta pra cá?"
         if sock == s:
             # Cliente recebe mensagem
             data = sock.recv(10)
@@ -32,19 +32,19 @@ while 1:
                 print 'Cliente não pôde receber mensagem.'
                 sys.exit(0)
             else :
-                mtd_clt.recebe_MSG(data,s,id_proprio,idf_serv) # Recebe e printa mensagem recebida pelo serv.
+                mtd_clt.recebe_MSG(data,s,id_proprio,idf_serv,num_seq) # Recebe e printa mensagem recebida pelo serv.
         else :
             # Cliente envia mensagem
             mensagem = mtd_clt.digita_mensagem()
             if mensagem == "FLW": # Encerra conexão
-                flw_result = mtd_clt.msg_FLW(id_proprio,s,id_dest)
+                flw_result = mtd_clt.msg_FLW(id_proprio,s,id_dest,num_seq)
             elif mensagem == "CREQ": # Requisita ao servidor a lista de clientes conectados
-                mtd_clt.msg_CREQ(id_proprio,s)
+                mtd_clt.msg_CREQ(id_proprio,s,num_seq)
             elif mensagem[0:7] == "CONECTA": # Seleciona com qual cliente vai se conectar
                 id_dest = int(mensagem[8:])
                 print "Conectado a cliente " + str(id_dest)
             else: # Envia mensagem ao cliente já conectado
-                if id_dest != 65535:
-                    msg_result = mtd_clt.msg_MSG(mensagem,id_proprio,s,id_dest)
+                if id_dest != 65535: # Confere se o cliente definiu com qual cliente irá se comunicar (se usou CONECTA)
+                    num_seq = mtd_clt.msg_MSG(mensagem,id_proprio,s,id_dest,num_seq)
                 else:
                     print "ERRO AO ENVIAR MENSAGEM!\nDigite 'CONECTA' e o número do cliente que se deseja conectar."

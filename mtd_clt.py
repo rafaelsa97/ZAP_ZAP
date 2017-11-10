@@ -44,11 +44,13 @@ def msg_OI(s):
 
 # msg_MSG(string com a mensagem digitada, numero do identificador, socket de com. com o serv.)
 # Insere cabecalho e envia mensagem digitada pelo user para o servidor
-# Saida: 0 caso haja falha, 1 caso tenha sucesso
-def msg_MSG(msg, id_cliente, s, id_dest):
+# Saida: número de sequência das mensagens
+def msg_MSG(msg, id_cliente, s, id_dest,num_seq):
     # Cria cabecalho
     tipo = 5
-    tipo_idf = struct.pack('!4H', tipo, id_cliente, id_dest,0)
+    num_seq = num_seq + 1
+    print "Número de sequência = " + str(num_seq)
+    tipo_idf = struct.pack('!4H', tipo, id_cliente, id_dest,num_seq)
     # Encapsulamento do tamanho da mensagem
     tam = struct.pack('!H',len(msg))
     s_aux = ""
@@ -58,15 +60,15 @@ def msg_MSG(msg, id_cliente, s, id_dest):
     ok = struct.unpack('!4H',s.recv(8))
     while ok[0] != 1:
         ok = struct.unpack('!4H',s.recv(8))
-    return 1
+    return num_seq
 
 # msg_FLW(identificador do cliente, socket ligado ao servidor)
 # Envia mensagem ao servidor informando saida
 # Saida: 0 caso haja falha, 1 caso tenha sucesso
-def msg_FLW(id_cliente,s,id_dest):
+def msg_FLW(id_cliente,s,id_dest,num_seq):
     # Cria cabecalho
     tipo = 4
-    tipo_idf = struct.pack('!4H', tipo, id_cliente, id_dest,0)
+    tipo_idf = struct.pack('!4H', tipo, id_cliente, id_dest,num_seq)
     s.send(tipo_idf)
     ok = struct.unpack('!4H',s.recv(8))
     while ok[0] != 1:
@@ -77,12 +79,12 @@ def msg_FLW(id_cliente,s,id_dest):
 # msg_CREQ(identificador do cliente, socket ligado ao servidor)
 # Envia requisição para receber lista de clientes conectados ao servidor e os imprime na tela
 # Saida: 0 caso haja falha, 1 caso tenha sucesso
-def msg_CREQ(idf,s):
+def msg_CREQ(idf,s,num_seq):
     # Cria cabecalho
     tipo_CREQ = 6
     idf_serv = 65535
     # Envia requisição da lista:
-    cabec = struct.pack('!4H', tipo_CREQ, idf, idf_serv,0)
+    cabec = struct.pack('!4H', tipo_CREQ, idf, idf_serv,num_seq)
     s.send(cabec)
     buf = s.recv(10) # Recebe cabec + tamanho da lista de clientes
     if buf:
@@ -92,10 +94,10 @@ def msg_CREQ(idf,s):
             buf2 = struct.unpack('!H',s.recv(2))
             print "Cliente " + str(buf2[0])
         # Envia um ok para o servidor
-        s.send(struct.pack('!4H',1,idf,idf_serv,0))
+        s.send(struct.pack('!4H',1,idf,idf_serv,num_seq))
     else:
         # Envia uma mensagem de erro ao servidor
-        s.send(struct.pack('!4H',2,idf,idf_serv,0))
+        s.send(struct.pack('!4H',2,idf,idf_serv,num_seq))
 
 # digita_mensagem()
 # Obtém a mensagem enviada pelo usuário através do terminal
@@ -113,12 +115,12 @@ def digita_mensagem():
 # recebe_MSG(cabeçalho da mensagem recebida, socket do cliente com o serv., id. do cliente, id. do serv.)
 # Recebe mensagem encaminhada pelo servidor
 # Saida: ---//---
-def recebe_MSG(data,s,id_proprio,idf_serv):
-    tipo, id_remet, id_dest, ordem, tam = struct.unpack('!5H', data)
+def recebe_MSG(data,s,id_proprio,idf_serv,num_seq):
+    tipo, id_remet, id_dest, num_seq, tam = struct.unpack('!5H', data)
     mensagem = ""
     for i in range(tam):
         byte = struct.unpack('!B', s.recv(1))
         mensagem = mensagem + str(chr(byte[0]))
     # Envia um ok para o servidor
-    s.send(struct.pack('!4H',1,id_proprio,idf_serv,0))
+    s.send(struct.pack('!4H',1,id_proprio,idf_serv,num_seq))
     print "MSG> " + mensagem
