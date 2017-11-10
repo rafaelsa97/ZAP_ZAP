@@ -32,21 +32,12 @@ while 1:
     for sock in ready_to_read:
         if sock == s:
             # Cliente recebe mensagem
-            data = sock.recv(8)
+            data = sock.recv(10)
             if not data :
                 print 'Cliente não pôde receber mensagem.'
                 sys.exit(0)
             else :
-                #print data
-                tipo, id_remet, id_dest, tam = struct.unpack('!4H', data)
-                mensagem = ""
-                for i in range(tam):
-                    byte = struct.unpack('!B', s.recv(1))
-                    mensagem = mensagem + str(chr(byte[0]))
-                # Envia um ok para o servidor
-                s.send(struct.pack('!4H',1,id_proprio,idf_serv,0))
-                sys.stdout.write('-vamo ver se aparece> '); sys.stdout.flush()
-                sys.stdout.write(mensagem)
+                mtd_clt.recebe_MSG(data,s,id_proprio,idf_serv)
         else :
             # Cliente envia mensagem
             mensagem = mtd_clt.digita_mensagem()

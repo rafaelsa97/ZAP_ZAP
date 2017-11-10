@@ -10,7 +10,7 @@ import sys
 
 #Endereco IP e porto da comunicacao
 IP = ''
-PORTO = 51513
+PORTO = 51515
 
 SOCKET_LIST = []
 RECV_BUFFER = 4096
@@ -82,7 +82,7 @@ while 1:
                                     # Empacota o payload
                                     s_aux = ""
                                     for c in msg:
-                                        s_aux = s_aux + struct.pack('!B',ord(i))
+                                        s_aux = s_aux + struct.pack('!B',ord(c))
                                     print s_aux
                                     for i in SOCKET_LIST:
                                         print "testem"

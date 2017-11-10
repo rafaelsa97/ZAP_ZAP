@@ -93,3 +93,17 @@ def digita_mensagem():
     # Caso o stdin leia um enter, o enter "\n" é removido da string
     mensagem = buf.replace("\n","")
     return mensagem
+
+# recebe_MSG(cabeçalho da mensagem recebida, socket do cliente com o serv., id. do cliente, id. do serv.)
+# Recebe mensagem encaminhada pelo servidor
+# Saida: ---//---
+def recebe_MSG(data,s,id_proprio,idf_serv):
+    tipo, id_remet, id_dest, ordem, tam = struct.unpack('!5H', data)
+    print tipo, id_remet, id_dest, ordem, tam
+    mensagem = ""
+    for i in range(tam):
+        byte = struct.unpack('!B', s.recv(1))
+        mensagem = mensagem + str(chr(byte[0]))
+    # Envia um ok para o servidor
+    s.send(struct.pack('!4H',1,id_proprio,idf_serv,0))
+    print "MSG> " + mensagem
