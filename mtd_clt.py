@@ -3,6 +3,26 @@ import struct
 import sys
 import socket
 
+class bcolors:
+    HEADER = '\033[95m'  # Rosa claro
+    OKBLUE = '\033[94m'  # Azul
+    OKGREEN = '\033[92m' # Verde
+    WARNING = '\033[93m' # Amarelo
+    FAIL = '\033[91m'    # Vermelho
+    ENDC = '\033[0m'     # Branco
+
+def apresentacao():
+    print bcolors.OKBLUE + "\n\n███████╗ █████╗ ██████╗     ███████╗ █████╗ ██████╗ " + bcolors.ENDC
+    print bcolors.OKBLUE + "╚══███╔╝██╔══██╗██╔══██╗    ╚══███╔╝██╔══██╗██╔══██╗" + bcolors.ENDC
+    print bcolors.OKBLUE + "  ███╔╝ ███████║██████╔╝      ███╔╝ ███████║██████╔╝" + bcolors.ENDC
+    print bcolors.OKBLUE + " ███╔╝  ██╔══██║██╔═══╝      ███╔╝  ██╔══██║██╔═══╝ " + bcolors.ENDC
+    print bcolors.OKBLUE + "███████╗██║  ██║██║         ███████╗██║  ██║██║     " + bcolors.ENDC
+    print bcolors.OKBLUE + "╚══════╝╚═╝  ╚═╝╚═╝         ╚══════╝╚═╝  ╚═╝╚═╝     \n" + bcolors.ENDC
+    print bcolors.OKBLUE + "Por Bhryan Henderson e Rafael Santos de Almeida\n" + bcolors.ENDC
+    print bcolors.FAIL + "------- COMANDOS -------"
+    print bcolors.WARNING + "CREQ: Lista os clientes online\nCONECTA [num]: Conecta a um cliente online"
+    print bcolors.WARNING + "FLW: Desconecta\n" + bcolors.ENDC
+
 # cria_socket_e_conecta(número de IP,número do PORTO)
 # Cria um socket e o conecta ao servidor
 # Saida: socket com o servidor

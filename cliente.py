@@ -9,7 +9,7 @@ import struct
 import mtd_clt
 import select
 
-print "ZAP ZAP initiated"
+mtd_clt.apresentacao()
 # Endereco de IP  e porto de comunicacao ouvido pelo cliente:
 IP = sys.argv[2]
 PORTO = int(sys.argv[3])
