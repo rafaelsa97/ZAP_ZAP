@@ -10,7 +10,7 @@ import sys
 
 #Endereco IP e porto da comunicacao
 IP = ''
-PORTO = 51515
+PORTO = PORTO = int(sys.argv[2])
 
 SOCKET_LIST = []
 RECV_BUFFER = 4096
@@ -83,10 +83,9 @@ while 1:
                                     s_aux = ""
                                     for c in msg:
                                         s_aux = s_aux + struct.pack('!B',ord(c))
-                                    print s_aux
                                     for i in SOCKET_LIST:
-                                        print "testem"
                                         i.send(data + s_aux)
+                                        print "MANDOU NO BROADCAST"
                                         ok = client.recv(8)
                                         print "JKJAKLSDJAKLSFS"
                                         error = False

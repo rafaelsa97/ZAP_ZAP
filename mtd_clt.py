@@ -1,6 +1,21 @@
 # -*- coding: utf-8 -*-
 import struct
 import sys
+import socket
+
+# cria_socket_e_conecta(número de IP,número do PORTO)
+# Cria um socket e o conecta ao servidor
+# Saida: socket com o servidor
+def cria_socket_e_conecta(IP,PORTO):
+    # Cria um soquete com o servidor
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    # Conecta ao servidor
+    try:
+        s.connect((IP, PORTO))
+    except:
+        print "Não foi possível conectar ao servidor"
+        sys.exit(0)
+    return s
 
 # msg_OI(socket ligado ao servidor)
 # Envia mensagem ao servidor requisitando numero de identificador

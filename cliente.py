@@ -13,20 +13,14 @@ print "ZAP ZAP initiated"
 # Endereco de IP  e porto de comunicacao ouvido pelo cliente:
 IP = sys.argv[2]
 PORTO = int(sys.argv[3])
-# Cria um soquete com o servidor
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-# Conecta ao servidor
-try:
-    s.connect((IP, PORTO))
-except:
-    print "Não foi possível conectar ao servidor"
-    sys.exit()
+# Cria socket com o servidor
+s = mtd_clt.cria_socket_e_conecta(IP,PORTO)
 # Obtem num. identificador com o servidor
 id_proprio = mtd_clt.msg_OI(s)
 idf_serv = 65535
 id_dest = 65535 # Número de identificador do destinatário
 while 1:
-    # Função select
+    # Função select:
     socket_list = [sys.stdin, s]
     ready_to_read,ready_to_write,in_error = select.select(socket_list , [], [])
     for sock in ready_to_read:
@@ -37,7 +31,7 @@ while 1:
                 print 'Cliente não pôde receber mensagem.'
                 sys.exit(0)
             else :
-                mtd_clt.recebe_MSG(data,s,id_proprio,idf_serv)
+                mtd_clt.recebe_MSG(data,s,id_proprio,idf_serv) # Recebe e printa mensagem recebida pelo serv.
         else :
             # Cliente envia mensagem
             mensagem = mtd_clt.digita_mensagem()
@@ -50,11 +44,9 @@ while 1:
                 mtd_clt.msg_CREQ(id_proprio,s)
             elif mensagem[0:7] == "CONECTA": # Seleciona com qual cliente vai se conectar
                 id_dest = int(mensagem[8:])
-                print "id_dest: " + str(id_dest)
+                print "Conectado a cliente " + str(id_dest)
             else: # Envia mensagem ao cliente já conectado
                 if id_dest != 65535:
                     msg_result = mtd_clt.msg_MSG(mensagem,id_proprio,s,id_dest)
-                    print "id_dest: " + str(id_dest)
                 else:
                     print "ERRO AO ENVIAR MENSAGEM!\nDigite 'CONECTA' e o número do cliente que se deseja conectar."
-                    print "id_dest: " + str(id_dest)
