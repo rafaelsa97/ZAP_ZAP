@@ -60,7 +60,7 @@ def msg_MSG(msg, id_cliente, s, id_dest,num_seq):
     try:
         ok = struct.unpack('!4H',s.recv(8))
     except:
-        print "Não foi possível obter a confirmação com o servidor"
+        print "Não foi possível obter a confirmação de recebimento com o servidor"
         s.close
         sys.exit(0)
     return num_seq
@@ -73,9 +73,12 @@ def msg_FLW(id_cliente,s,id_dest,num_seq):
     tipo = 4
     tipo_idf = struct.pack('!4H', tipo, id_cliente, id_dest,num_seq)
     s.send(tipo_idf)
-    ok = struct.unpack('!4H',s.recv(8))
-    while ok[0] != 1:
+    try:
         ok = struct.unpack('!4H',s.recv(8))
+    except:
+        print "Não foi possível obter a confirmação com o servidor"
+        s.close
+        sys.exit(0)
     s.close
     sys.exit(0)
 
