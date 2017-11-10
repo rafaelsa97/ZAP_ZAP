@@ -69,6 +69,5 @@ def encaminha_msg(list,data,s_aux,client,serversoket):
 			print pacote
 			j.send(pacote)
 			print "MANDOU NO BROADCAST"
-			ok = client.recv(8)
+			ok = j.recv(8)
 			print "JKJAKLSDJAKLSFS"
-			error = False
