@@ -12,6 +12,7 @@ def cria_socket_e_conecta(IP,PORTO):
     # Conecta ao servidor
     try:
         s.connect((IP, PORTO))
+        s.settimeout(5)
     except:
         print "Não foi possível conectar ao servidor"
         sys.exit(0)
@@ -56,9 +57,12 @@ def msg_MSG(msg, id_cliente, s, id_dest,num_seq):
     for i in msg:
         s_aux = s_aux + struct.pack('!B',ord(i))
     s.send(tipo_idf + tam + s_aux)
-    ok = struct.unpack('!4H',s.recv(8))
-    while ok[0] != 1:
+    try:
         ok = struct.unpack('!4H',s.recv(8))
+    except:
+        print "Não foi possível obter a confirmação com o servidor"
+        s.close
+        sys.exit(0)
     return num_seq
 
 # msg_FLW(identificador do cliente, socket ligado ao servidor)
