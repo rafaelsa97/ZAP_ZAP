@@ -20,6 +20,13 @@ def clist(sock,server_id,id_remet,list):
 	aux = struct.pack("!5H",id,server_id,id_remet,0,num)
 	sock.send(aux + new_list)
 
+def buscaID(list,sock):
+    cont = 0
+    while cont < len(list):
+        if list[cont] == sock :
+                return cont
+        else:
+                cont +=1
 
 def send_message(id_remet,id_dest,data,lista_socket):
 	if id_dest == 0:
@@ -49,15 +56,16 @@ def procuraSock(dest,list):
         else:
                 return client
 
-def buscaID(list,sock):
-    cont = 0
-    while cont < len(list):
-        if list[cont] == sock :
-                return cont
-        else:
-                cont +=1
-
 def fecharSocket(sock,list):
     ID = buscaID(sock)
     list[ID] = 0
     sock.close()
+
+def encaminha_msg(list,data,s_aux,client):
+	for j in list:
+		print "here we go"
+		j.send(data + s_aux)
+		print "MANDOU NO BROADCAST"
+		ok = client.recv(8)
+		print "JKJAKLSDJAKLSFS"
+		error = False

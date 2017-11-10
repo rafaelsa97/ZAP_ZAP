@@ -83,12 +83,7 @@ while 1:
                                     s_aux = ""
                                     for c in msg:
                                         s_aux = s_aux + struct.pack('!B',ord(c))
-                                    for i in SOCKET_LIST:
-                                        i.send(data + s_aux)
-                                        print "MANDOU NO BROADCAST"
-                                        ok = client.recv(8)
-                                        print "JKJAKLSDJAKLSFS"
-                                        error = False
+                                    mtd_svr.encaminha_msg(SOCKET_LIST,data,s_aux,client)
                                 else:
                                     dest =  procuraSock(id_dest,lista_socket)
                                     print "Socket destino: " + str(dest)
