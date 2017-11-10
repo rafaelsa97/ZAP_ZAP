@@ -38,19 +38,21 @@ while 1:
                 if sock == serversocket:
                         client,addr = serversocket.accept()
                         SOCKET_LIST.append(client)
-                               # Recebe requisicao do cliente
-                        print "Cliente (%s, %s) connectado" % addr
-                        data = client.recv(8)
+                        data = client.recv(8) # Recebe requisicao inicial do cliente para conectar ao servidor
                         if not data:
-                                break
+                            print "ERRO\nNão foi possível o cliente conectar ao servidor"
+                            serversocket.close()
+                            sys.exit(0)
                         else:
-                                data = struct.unpack('!4H',data)
-                                if data[0] == 3:
-                                        new_client_id = mtd_svr.buscaID(SOCKET_LIST,client)
-                                        if not new_client_id:
-                                                break
-                                        else:
-                                                mtd_svr.ok(client,server_id,new_client_id)
+                            print "Cliente (%s, %s) connectado" % addr
+                            data = struct.unpack('!4H',data)
+                            if data[0] == 3: # Identifica se recebeu um pacote tipo OI
+                                    new_client_id = mtd_svr.buscaID(SOCKET_LIST,client)
+                                    if not new_client_id:
+                                            print "Não foi possível atribuir núm.de identificadorao cliente"
+                                            break
+                                    else:
+                                            mtd_svr.ok(client,server_id,new_client_id)
 
                 else:
                           # process data recieved from client,
@@ -58,12 +60,7 @@ while 1:
                         # receiving data from the socket.
                         data = sock.recv(10)
                         if data:
-                            msg = ''
-                            tipo,id_remet,id_dest,ordem,tam = struct.unpack("!5H",data)
-                            for i in range(tam):
-                                byte = struct.unpack('!B',sock.recv(1))
-                                msg = msg + str(chr(byte[0]))
-                            print tipo,id_remet,id_dest,ordem,tam,msg
+                            tipo,id_remet,id_dest,ordem,tam,msg = mtd_svr.recebe_mensagem(data,sock)
 
                             #Mensagem de CREQ
                             if tipo == 6:
@@ -99,9 +96,6 @@ while 1:
                                 if sock in SOCKET_LIST:
                                     mtd_svr.ok(sock,server_id,id_remet)
                                     mtd_svr.fecharSocket(sock,SOCKET_LIST)
-
-
-
                     except:
                         continue
 

@@ -13,20 +13,20 @@ print "ZAP ZAP initiated"
 # Endereco de IP  e porto de comunicacao ouvido pelo cliente:
 IP = sys.argv[2]
 PORTO = int(sys.argv[3])
+idf_serv = 65535 # Número de identificador do servidor
+id_dest  = 65535 # Número de identificador do destinatário
 # Cria socket com o servidor
 s = mtd_clt.cria_socket_e_conecta(IP,PORTO)
 # Obtem num. identificador com o servidor
 id_proprio = mtd_clt.msg_OI(s)
-idf_serv = 65535
-id_dest = 65535 # Número de identificador do destinatário
 while 1:
     # Função select:
     socket_list = [sys.stdin, s]
     ready_to_read,ready_to_write,in_error = select.select(socket_list , [], [])
     for sock in ready_to_read:
+        print "Será que volta pra cá?"
         if sock == s:
             # Cliente recebe mensagem
-            print "Opa, recebi alguma coisa"
             data = sock.recv(10)
             if not data :
                 print 'Cliente não pôde receber mensagem.'
@@ -38,9 +38,6 @@ while 1:
             mensagem = mtd_clt.digita_mensagem()
             if mensagem == "FLW": # Encerra conexão
                 flw_result = mtd_clt.msg_FLW(id_proprio,s,id_dest)
-                s.close
-                sys.exit(0)
-                break
             elif mensagem == "CREQ": # Requisita ao servidor a lista de clientes conectados
                 mtd_clt.msg_CREQ(id_proprio,s)
             elif mensagem[0:7] == "CONECTA": # Seleciona com qual cliente vai se conectar

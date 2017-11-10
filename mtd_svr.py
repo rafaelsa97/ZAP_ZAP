@@ -1,8 +1,22 @@
+# -*- coding: utf-8 -*-
 import struct
 import socket
 
 def erro(s,idf_r,idf_d):
 	s.send(struct.pack('!4H',2,idf_r,idf_d,69))
+
+# recebe_cabecalho(cabeçalho empacotado, socket do cliente)
+# Recebe mensagem do cliente
+# Saida: dados do pacote desempacotados
+def recebe_mensagem(data,sock):
+	msg = ''
+	tipo,id_remet,id_dest,ordem,tam = struct.unpack("!5H",data)
+	# Obtém o payload da mensagem
+	for i in range(tam):
+		byte = struct.unpack('!B',sock.recv(1))
+		msg = msg + str(chr(byte[0]))
+	print tipo,id_remet,id_dest,ordem,tam,msg
+	return tipo,id_remet,id_dest,ordem,tam,msg
 
 def ok(s,idf_r,idf_d):
 	s.send(struct.pack('!4H',1,idf_r,idf_d,69))

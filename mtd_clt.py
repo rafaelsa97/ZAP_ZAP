@@ -34,7 +34,7 @@ def msg_OI(s):
         if idf == 0:
             print "Cliente recebeu número de identificador igual ao do servidor"
             s.close
-            sys.exit()
+            sys.exit(0)
         print "Identificador: " + str(idf)
         sys.stdout.write('-> '); sys.stdout.flush()
         return idf
@@ -71,7 +71,8 @@ def msg_FLW(id_cliente,s,id_dest):
     ok = struct.unpack('!4H',s.recv(8))
     while ok[0] != 1:
         ok = struct.unpack('!4H',s.recv(8))
-    return 1, 0
+    s.close
+    sys.exit(0)
 
 # msg_CREQ(identificador do cliente, socket ligado ao servidor)
 # Envia requisição para receber lista de clientes conectados ao servidor e os imprime na tela
@@ -114,7 +115,6 @@ def digita_mensagem():
 # Saida: ---//---
 def recebe_MSG(data,s,id_proprio,idf_serv):
     tipo, id_remet, id_dest, ordem, tam = struct.unpack('!5H', data)
-    print tipo, id_remet, id_dest, ordem, tam
     mensagem = ""
     for i in range(tam):
         byte = struct.unpack('!B', s.recv(1))
