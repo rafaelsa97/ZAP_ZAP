@@ -38,9 +38,10 @@ while 1:
             # Cliente envia mensagem
             mensagem = mtd_clt.digita_mensagem()
             if mensagem == "FLW": # Encerra conexão
-                flw_result = mtd_clt.msg_FLW(id_proprio,s,id_dest,num_seq)
+                mtd_clt.msg_FLW(id_proprio,s,id_dest,num_seq)
             elif mensagem == "CREQ": # Requisita ao servidor a lista de clientes conectados
                 mtd_clt.msg_CREQ(id_proprio,s,num_seq)
+                sys.stdout.write("-> ")
             elif mensagem[0:7] == "CONECTA": # Seleciona com qual cliente vai se conectar
                 id_dest = int(mensagem[8:])
                 print "Conectado a cliente " + str(id_dest)
@@ -49,3 +50,4 @@ while 1:
                     num_seq = mtd_clt.msg_MSG(mensagem,id_proprio,s,id_dest,num_seq)
                 else:
                     print "ERRO AO ENVIAR MENSAGEM!\nDigite 'CONECTA' e o número do cliente que se deseja conectar."
+        sys.stdout.write("-> "); sys.stdout.flush()
