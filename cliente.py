@@ -20,6 +20,7 @@ s = mtd_clt.cria_socket_e_conecta(IP,PORTO)
 # Obtem num. identificador com o servidor
 id_proprio = mtd_clt.msg_OI(s)
 num_seq = 0 # Número de sequência das mensagens
+
 while 1:
     # Função select:
     socket_list = [sys.stdin, s]
@@ -41,6 +42,7 @@ while 1:
             elif mensagem == "CREQ": # Requisita ao servidor a lista de clientes conectados
                 mtd_clt.msg_CREQ(id_proprio,s,num_seq)
             elif mensagem[0:7] == "CONECTA": # Seleciona com qual cliente vai se conectar
+                num_seq = 0
                 id_dest = int(mensagem[8:])
                 print "Conectado a cliente " + str(id_dest)
             else: # Envia mensagem ao cliente já conectado
