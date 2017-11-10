@@ -26,6 +26,7 @@ while 1:
     for sock in ready_to_read:
         if sock == s:
             # Cliente recebe mensagem
+            print "Opa, recebi alguma coisa"
             data = sock.recv(10)
             if not data :
                 print 'Cliente não pôde receber mensagem.'

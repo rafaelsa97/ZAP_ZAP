@@ -1,4 +1,5 @@
 import struct
+import socket
 
 def erro(s,idf_r,idf_d):
 	s.send(struct.pack('!4H',2,idf_r,idf_d,69))
@@ -61,11 +62,13 @@ def fecharSocket(sock,list):
     list[ID] = 0
     sock.close()
 
-def encaminha_msg(list,data,s_aux,client):
+def encaminha_msg(list,data,s_aux,client,serversoket):
 	for j in list:
-		print "here we go"
-		j.send(data + s_aux)
-		print "MANDOU NO BROADCAST"
-		ok = client.recv(8)
-		print "JKJAKLSDJAKLSFS"
-		error = False
+		if j != serversoket:
+			pacote = data + s_aux
+			print pacote
+			j.send(pacote)
+			print "MANDOU NO BROADCAST"
+			ok = client.recv(8)
+			print "JKJAKLSDJAKLSFS"
+			error = False

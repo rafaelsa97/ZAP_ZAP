@@ -83,7 +83,7 @@ while 1:
                                     s_aux = ""
                                     for c in msg:
                                         s_aux = s_aux + struct.pack('!B',ord(c))
-                                    mtd_svr.encaminha_msg(SOCKET_LIST,data,s_aux,client)
+                                    mtd_svr.encaminha_msg(SOCKET_LIST,data,s_aux,client,serversocket)
                                 else:
                                     dest =  procuraSock(id_dest,lista_socket)
                                     print "Socket destino: " + str(dest)
