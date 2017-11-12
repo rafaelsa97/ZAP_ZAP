@@ -78,6 +78,8 @@ def msg_OI(s):
 # Insere cabecalho e envia mensagem digitada pelo user para o servidor
 # Saida: número de sequência das mensagens
 def msg_MSG(msg, id_cliente, s, id_dest,num_seq):
+    if not msg:
+        return num_seq
     # Cria cabecalho
     tipo = 5
     num_seq = num_seq + 1
