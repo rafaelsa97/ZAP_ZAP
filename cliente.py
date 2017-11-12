@@ -36,7 +36,7 @@ while 1:
             else :
                 mtd_clt.recebe_MSG(data,s,id_proprio,idf_serv,num_seq) # Recebe e printa mensagem recebida pelo serv.
         else :
-            # Cliente envia mensagem
+            # Obtém comando/mensagem digitado pelo usuário
             mensagem = mtd_clt.digita_mensagem()
             if mensagem == "FLW": # Encerra conexão
                 mtd_clt.msg_FLW(id_proprio,s,id_dest,num_seq)
@@ -47,8 +47,7 @@ while 1:
             elif mensagem == "IDF": # Requisita o número de identificador próprio
                 print "Identificador: " + str(id_proprio)
             elif mensagem[0:8] == "CONECTA ": # Seleciona com qual cliente vai se conectar
-                id_dest = int(mensagem[8:])
-                print "Conectado a cliente " + str(id_dest)
+                id_dest = mtd_clt.conecta_a_destinatario(int(mensagem[8:]),id_proprio)
             else: # Envia mensagem ao cliente já conectado
                 if id_dest != 65535: # Confere se o cliente definiu com qual cliente irá se comunicar (se usou CONECTA)
                     num_seq = mtd_clt.msg_MSG(mensagem,id_proprio,s,id_dest,num_seq)
