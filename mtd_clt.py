@@ -11,6 +11,9 @@ class bcolors:
     FAIL = '\033[91m'    # Vermelho
     ENDC = '\033[0m'     # Branco
 
+# apresentacao()
+# Mensagem inicial
+# Saida: ---//---
 def apresentacao():
     print bcolors.OKBLUE + "\n\n███████╗ █████╗ ██████╗     ███████╗ █████╗ ██████╗ " + bcolors.ENDC
     print bcolors.OKBLUE + "╚══███╔╝██╔══██╗██╔══██╗    ╚══███╔╝██╔══██╗██╔══██╗" + bcolors.ENDC
@@ -20,7 +23,7 @@ def apresentacao():
     print bcolors.OKBLUE + "╚══════╝╚═╝  ╚═╝╚═╝         ╚══════╝╚═╝  ╚═╝╚═╝     \n" + bcolors.ENDC
     print bcolors.OKBLUE + "Por Bhryan Henderson e Rafael Santos de Almeida\n" + bcolors.ENDC
     print bcolors.FAIL + "------- COMANDOS -------"
-    print bcolors.WARNING + "CREQ: Lista os clientes online\nCONECTA [num]: Conecta a um cliente online"
+    print bcolors.WARNING + "CREQ: Lista os clientes online\nCONECTA \"num\": Conecta a um cliente online"
     print bcolors.WARNING + "FLW: Desconecta\n" + bcolors.ENDC
 
 # cria_socket_e_conecta(número de IP,número do PORTO)
@@ -61,6 +64,7 @@ def msg_OI(s):
         return idf
     else:
         print "Falha na atribuicao de numero de identificador pelo servidor"
+        s.close
         sys.exit(0)
 
 # msg_MSG(string com a mensagem digitada, numero do identificador, socket de com. com o serv.)
@@ -150,3 +154,23 @@ def recebe_MSG(data,s,id_proprio,idf_serv,num_seq):
     # Envia um ok para o servidor
     s.send(struct.pack('!4H',1,id_proprio,idf_serv,num_seq))
     print "\n" + str(id_remet) + " diz: " + mensagem
+
+# recebe_ok(socket com o servidor, número de sequência esperado)
+# Confere se recebeu um OK do servidor e se ele se trata do num. sequência esperado
+# Saida: ---//---
+def recebe_ok(s,num_seq):
+    tipo, idf_org, idf_dst, num_seq_rec, tam_lista = struct.unpack('!4H',s.recv(8))
+    # Confere se recebeu erro
+    if tipo == 1:
+        return
+    elif tipo == 2:
+        print "Erro ao receber confirmação de recebimento de mensagem pelo servidor."
+        s.close
+        sys.exit(0)
+    # Confere se a confirmação recebida é relativa à mensagem de mesmo num. de sequência
+    if num_seq_rec != num_seq:
+        print "Confirmação recebida do servidor com número de sequência não esperado."
+        print "Número de sequência recebido: " + num_seq_rec
+        print "Número de sequência esperado: " + num_seq_rec
+        s.close
+        sys.exit(0)

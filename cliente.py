@@ -41,7 +41,7 @@ while 1:
                 mtd_clt.msg_FLW(id_proprio,s,id_dest,num_seq)
             elif mensagem == "CREQ": # Requisita ao servidor a lista de clientes conectados
                 mtd_clt.msg_CREQ(id_proprio,s,num_seq)
-            elif mensagem[0:7] == "CONECTA": # Seleciona com qual cliente vai se conectar
+            elif mensagem[0:8] == "CONECTA ": # Seleciona com qual cliente vai se conectar
                 id_dest = int(mensagem[8:])
                 print "Conectado a cliente " + str(id_dest)
             else: # Envia mensagem ao cliente já conectado
