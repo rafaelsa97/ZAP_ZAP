@@ -44,7 +44,7 @@ while 1:
                 mtd_clt.msg_CREQ(id_proprio,s,num_seq)
             elif mensagem == "HELP": # Requisita a lista de comandos
                 mtd_clt.lista_comandos()
-            elif mensagem == "IDF": # Requisita a lista de comandos
+            elif mensagem == "IDF": # Requisita o número de identificador próprio
                 print "Identificador: " + str(id_proprio)
             elif mensagem[0:8] == "CONECTA ": # Seleciona com qual cliente vai se conectar
                 id_dest = int(mensagem[8:])
