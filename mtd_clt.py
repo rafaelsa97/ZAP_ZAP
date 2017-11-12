@@ -1,8 +1,17 @@
 # -*- coding: utf-8 -*-
+
+# ============================ ZAP ZAP - Cliente ============================
+# Programa de chat desenvolvido para a disciplina de Redes de Computadores
+# UNIVERSIDADE FEDERAL DE MINAS GERAIS
+# Desenvolvido por Bhryan Henderson Lopes Perpétuo e Rafael Santos de Almeida
+# Novembro de 2017
+# ===========================================================================
+
 import struct
 import sys
 import socket
 
+# Classe para formatar as cores do texto de apresentacao e lista_comandos
 class bcolors:
     HEADER = '\033[95m'  # Rosa claro
     OKBLUE = '\033[94m'  # Azul
@@ -34,22 +43,22 @@ def lista_comandos():
 
 # cria_socket_e_conecta(número de IP,número do PORTO)
 # Cria um socket e o conecta ao servidor
-# Saída: socket com o servidor
+# Saída: socket com o servidor, caso haja sucesso
 def cria_socket_e_conecta(IP,PORTO):
     # Cria um soquete com o servidor
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # Conecta ao servidor
     if s:
         s.connect((IP, PORTO))
-        s.settimeout(5)
-    else:
+    else: # Encerra caso haja erro
         print "Não foi possível conectar ao servidor"
+        s.close
         sys.exit(0)
     return s
 
 # msg_OI(socket ligado ao servidor)
-# Envia mensagem ao servidor requisitando numero de identificador
-# Saída: número de identificador, caso tenha sucesso
+# Envia mensagem ao servidor requisitando número de identificador
+# Saída: número de identificador, caso haja sucesso
 def msg_OI(s):
     s.send(struct.pack('!4H',3,0,65535,0)) # Envia requisião OI, se identificando ao servidor
     idf = s.recv(8)                        # Recebe confirmação do servidor
@@ -58,11 +67,10 @@ def msg_OI(s):
         print "O programa não pôde obter o número identificador com o servidor."
         s.close
         sys.exit(0)
-    s_aux = struct.unpack('!4H',idf) # Recebe confirmação do servidor
+    s_aux = struct.unpack('!4H',idf) # Desempacota confirmação do servidor
     idf =  int(s_aux[2])
-    # Confere se recebeu um ok do servidor
-    if s_aux[0] == 1:
-        if idf == 0 or idf == 65535:
+    if s_aux[0] == 1: # Confere se recebeu um ok do servidor
+        if idf == 0 or idf == 65535: # Confere se recebeu um núm. de identificador inválido
             print "ERRO!\nCliente recebeu número de identificador inválido"
             s.close
             sys.exit(0)
@@ -89,15 +97,15 @@ def conecta_a_destinatario(aux,id_proprio):
         print "Conectado a cliente " + str(id_dest)
         return id_dest
 
-# msg_MSG(string com a mensagem digitada, numero do identificador, socket de com. com o serv.)
-# Insere cabecalho e envia mensagem digitada pelo user para o servidor
+# msg_MSG(string com a mensagem digitada, núm. do identif. do cliente, socket com o serv., núm. do identif. do destinatário, número de sequência)
+# Insere cabecalho e envia mensagem digitada pelo usuário para o servidor
 # Saída: número de sequência das mensagens
 def msg_MSG(msg, id_cliente, s, id_dest,num_seq):
     if not msg:
         return num_seq
     # Cria cabecalho
     tipo = 5
-    num_seq = num_seq + 1
+    num_seq = num_seq + 1 # Incrementa o número de sequência
     tipo_idf = struct.pack('!4H', tipo, id_cliente, id_dest,num_seq) # Encapsulamento do cabeçalho
     tam = struct.pack('!H',len(msg)) # Encapsulamento do tamanho da mensagem
     # Recebe e empacota o payload
@@ -117,8 +125,8 @@ def msg_MSG(msg, id_cliente, s, id_dest,num_seq):
         sys.exit(0)
     return num_seq
 
-# msg_FLW(identificador do cliente, socket ligado ao servidor)
-# Envia mensagem ao servidor informando saida
+# msg_FLW(identificador do cliente, socket ligado ao servidor, identificador do destinatário, número de sequência)
+# Envia mensagem ao servidor informando saída
 # Saída: ---//---
 def msg_FLW(id_cliente,s,id_dest,num_seq):
     # Cria cabecalho
@@ -138,7 +146,7 @@ def msg_FLW(id_cliente,s,id_dest,num_seq):
     except socket.timeout:
         print "ERRO!\nNão foi possível obter a confirmação com o servidor. Tente novamente"
 
-# msg_CREQ(identificador do cliente, socket ligado ao servidor)
+# msg_CREQ(identificador do cliente, socket ligado ao servidor, número de sequência)
 # Envia requisição para receber lista de clientes conectados ao servidor e os imprime na tela
 # Saída: ---//---
 def msg_CREQ(idf,s,num_seq):
@@ -181,11 +189,12 @@ def digita_mensagem():
     mensagem = buf.replace("\n","")
     return mensagem
 
-# recebe_MSG(cabeçalho da mensagem recebida, socket do cliente com o serv., id. do cliente, id. do serv.)
+# recebe_MSG(cabeçalho da mensagem recebida, socket do cliente com o serv., id. do cliente, id. do serv., número de sequência)
 # Recebe mensagem encaminhada pelo servidor
 # Saída: ---//---
 def recebe_MSG(data,s,id_proprio,idf_serv,num_seq):
     tipo, id_remet, id_dest, num_seq, tam = struct.unpack('!5H', data)
+    # Recebe e desempacota o payload da mensagem:
     mensagem = ""
     for i in range(tam):
         byte = struct.unpack('!B', s.recv(1))
@@ -194,9 +203,9 @@ def recebe_MSG(data,s,id_proprio,idf_serv,num_seq):
     s.send(struct.pack('!4H',1,id_proprio,idf_serv,num_seq))
     print "\n" + str(id_remet) + " diz: " + mensagem
 
-# trata_ok(identificador do tipo da msg recebida, número de sequência esperado)
+# trata_ok(identificador do tipo da msg recebida, número de sequência esperado, socket com o servidor)
 # Confere se recebeu um OK do servidor e se ele se trata do num. sequência esperado
-# Saída: ---//---
+# Saída: 1 caso tenha recebido um OK, 2 caso tenha recebido um ERRO
 def trata_ok(tipo,num_seq,s):
     # Confere se recebeu erro
     if tipo == 1: # Recebido um OK

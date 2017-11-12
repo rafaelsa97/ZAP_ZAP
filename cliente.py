@@ -1,6 +1,13 @@
 # -*- coding: utf-8 -*-
 
-# CABECALHO:
+# ============================ ZAP ZAP - Cliente ============================
+# Programa de chat desenvolvido para a disciplina de Redes de Computadores
+# UNIVERSIDADE FEDERAL DE MINAS GERAIS
+# Desenvolvido por Bhryan Henderson Lopes Perpétuo e Rafael Santos de Almeida
+# Novembro de 2017
+# ===========================================================================
+
+# CABEÇALHO:
 # |tipo_da_msg || id_da_origem || id_do_destino || num_da_sequencia|
 
 import sys
@@ -9,6 +16,7 @@ import struct
 import mtd_clt
 import select
 
+# Mensagens iniciais:
 mtd_clt.apresentacao()
 mtd_clt.lista_comandos()
 # Endereco de IP  e porto de comunicacao ouvido pelo cliente:
@@ -32,19 +40,19 @@ while 1:
             data = sock.recv(10)
             if not data :
                 print 'Cliente não pôde receber mensagem.'
+                s.close
                 sys.exit(0)
             else :
                 mtd_clt.recebe_MSG(data,s,id_proprio,idf_serv,num_seq) # Recebe e printa mensagem recebida pelo serv.
         else :
-            # Obtém comando/mensagem digitado pelo usuário
-            mensagem = mtd_clt.digita_mensagem()
+            mensagem = mtd_clt.digita_mensagem() # Obtém comando/mensagem digitado pelo usuário
             if mensagem == "FLW": # Encerra conexão
                 mtd_clt.msg_FLW(id_proprio,s,id_dest,num_seq)
             elif mensagem == "CREQ": # Requisita ao servidor a lista de clientes conectados
                 mtd_clt.msg_CREQ(id_proprio,s,num_seq)
-            elif mensagem == "HELP": # Requisita a lista de comandos
+            elif mensagem == "HELP": # Imprime a lista de comandos
                 mtd_clt.lista_comandos()
-            elif mensagem == "IDF": # Requisita o número de identificador próprio
+            elif mensagem == "IDF": # Imprime o número de identificador próprio
                 print "Identificador: " + str(id_proprio)
             elif mensagem[0:8] == "CONECTA ": # Seleciona com qual cliente vai se conectar
                 id_dest = mtd_clt.conecta_a_destinatario(int(mensagem[8:]),id_proprio)
