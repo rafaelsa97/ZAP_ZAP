@@ -98,9 +98,9 @@ def msg_MSG(msg, id_cliente, s, id_dest,num_seq):
     # Cria cabecalho
     tipo = 5
     num_seq = num_seq + 1
-    tipo_idf = struct.pack('!4H', tipo, id_cliente, id_dest,num_seq)
-    # Encapsulamento do tamanho da mensagem
-    tam = struct.pack('!H',len(msg))
+    tipo_idf = struct.pack('!4H', tipo, id_cliente, id_dest,num_seq) # Encapsulamento do cabeçalho
+    tam = struct.pack('!H',len(msg)) # Encapsulamento do tamanho da mensagem
+    # Recebe e empacota o payload
     s_aux = ""
     for i in msg:
         s_aux = s_aux + struct.pack('!B',ord(i))
@@ -153,7 +153,10 @@ def msg_CREQ(idf,s,num_seq):
         tipo, idf_org, idf_dst, num_seq, tam_lista = struct.unpack('!5H',buf)
         # Confere se recebeu mensagem tipo CLIST
         if tipo != 7:
+            aux = s.recv(1024) # Recebe quaisquer outros pacotes que o servidor chegue a enviar
             print "ERRO!\nPacote recebido de tipo diferente de CLIST."
+            # Envia uma mensagem de erro ao servidor
+            s.send(struct.pack('!4H',2,idf,idf_serv,num_seq))
         else:
             print "---------- LISTA DE CLIENTES ----------"
             for i in range (tam_lista):
