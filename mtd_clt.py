@@ -58,12 +58,12 @@ def msg_OI(s):
         print "O programa não pôde obter o número identificador com o servidor."
         s.close
         sys.exit(0)
-    s_aux = struct.unpack('!4H',idf)
+    s_aux = struct.unpack('!4H',idf) # Recebe confirmação do servidor
     idf =  int(s_aux[2])
     # Confere se recebeu um ok do servidor
     if s_aux[0] == 1:
-        if idf == 0:
-            print "ERRO!\nCliente recebeu número de identificador igual ao do servidor"
+        if idf == 0 or idf == 65535:
+            print "ERRO!\nCliente recebeu número de identificador inválido"
             s.close
             sys.exit(0)
         print "Identificador: " + str(idf)
@@ -108,7 +108,9 @@ def msg_MSG(msg, id_cliente, s, id_dest,num_seq):
     try:
         s.settimeout(5)
         tipo, idf_org, idf_dst, num_seq_rec = struct.unpack('!4H',s.recv(8))
-        trata_ok(tipo,num_seq)
+        confirm = trata_ok(tipo,num_seq,s)
+        if confirm == 2:
+            print "ERRO!\nNão foi possível enviar mensagem. Confira se o destinatário está conectado com a função CREQ"
     except socket.timeout:
         print "Não foi possível obter a confirmação de recebimento com o servidor (tempo excessivo)"
         s.close
@@ -126,13 +128,17 @@ def msg_FLW(id_cliente,s,id_dest,num_seq):
     try:
         s.settimeout(5)
         tipo, idf_org, idf_dst, num_seq_rec = struct.unpack('!4H',s.recv(8))
-        trata_ok(tipo,num_seq)
+        confirm = trata_ok(tipo,num_seq,s)
+        if confirm == 1: # Recebeu um OK
+            print "Conexão encerrada."
+            s.close
+            sys.exit(0)
+        elif confirm == 2: # Recebeu um ERRO
+            print "ERRO!\nNão foi possível encerrar a conexão. Tente novamente"
     except socket.timeout:
         print "Não foi possível obter a confirmação com o servidor"
         s.close
         sys.exit(0)
-    s.close
-    sys.exit(0)
 
 # msg_CREQ(identificador do cliente, socket ligado ao servidor)
 # Envia requisição para receber lista de clientes conectados ao servidor e os imprime na tela
@@ -190,16 +196,16 @@ def recebe_MSG(data,s,id_proprio,idf_serv,num_seq):
 # trata_ok(identificador do tipo da msg recebida, número de sequência esperado)
 # Confere se recebeu um OK do servidor e se ele se trata do num. sequência esperado
 # Saída: ---//---
-def trata_ok(tipo,num_seq):
+def trata_ok(tipo,num_seq,s):
     # Confere se recebeu erro
-    if tipo == 1:
-        return
-    elif tipo == 2:
-        print "Erro ao receber confirmação de recebimento de mensagem pelo servidor."
-        sys.exit(0)
+    if tipo == 1: # Recebido um OK
+        return 1
+    elif tipo == 2: # Recebido um ERRO
+        return 2
     # Confere se a confirmação recebida é relativa à mensagem de mesmo num. de sequência
     if num_seq_rec != num_seq:
         print "Confirmação recebida do servidor com número de sequência não esperado."
         print "Número de sequência recebido: " + num_seq_rec
         print "Número de sequência esperado: " + num_seq_rec
+        s.close
         sys.exit(0)
