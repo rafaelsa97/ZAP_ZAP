@@ -10,6 +10,7 @@ import mtd_clt
 import select
 
 mtd_clt.apresentacao()
+mtd_clt.lista_comandos()
 # Endereco de IP  e porto de comunicacao ouvido pelo cliente:
 IP = sys.argv[2]
 PORTO = int(sys.argv[3])
@@ -41,6 +42,10 @@ while 1:
                 mtd_clt.msg_FLW(id_proprio,s,id_dest,num_seq)
             elif mensagem == "CREQ": # Requisita ao servidor a lista de clientes conectados
                 mtd_clt.msg_CREQ(id_proprio,s,num_seq)
+            elif mensagem == "HELP": # Requisita a lista de comandos
+                mtd_clt.lista_comandos()
+            elif mensagem == "IDF": # Requisita a lista de comandos
+                print "Identificador: " + str(id_proprio)
             elif mensagem[0:8] == "CONECTA ": # Seleciona com qual cliente vai se conectar
                 id_dest = int(mensagem[8:])
                 print "Conectado a cliente " + str(id_dest)

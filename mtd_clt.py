@@ -22,9 +22,15 @@ def apresentacao():
     print bcolors.OKBLUE + "███████╗██║  ██║██║         ███████╗██║  ██║██║     " + bcolors.ENDC
     print bcolors.OKBLUE + "╚══════╝╚═╝  ╚═╝╚═╝         ╚══════╝╚═╝  ╚═╝╚═╝     \n" + bcolors.ENDC
     print bcolors.OKBLUE + "Por Bhryan Henderson e Rafael Santos de Almeida\n" + bcolors.ENDC
+
+# lista_comandos()
+# Imprime a lista de comandos do programa
+# Saida: ---//---
+def lista_comandos():
     print bcolors.FAIL + "------- COMANDOS -------"
     print bcolors.WARNING + "CREQ: Lista os clientes online\nCONECTA \"num\": Conecta a um cliente online"
-    print bcolors.WARNING + "FLW: Desconecta\n" + bcolors.ENDC
+    print bcolors.WARNING + "FLW: Desconecta\nIDENTIFICADOR:Imprime o nº de identificador próprio do cliente"
+    print bcolors.WARNING + "HELP: Imprime a lista de comandos novamente\n" + bcolors.ENDC
 
 # cria_socket_e_conecta(número de IP,número do PORTO)
 # Cria um socket e o conecta ao servidor
