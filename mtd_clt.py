@@ -33,10 +33,10 @@ def cria_socket_e_conecta(IP,PORTO):
     # Cria um soquete com o servidor
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # Conecta ao servidor
-    try:
+    if s:
         s.connect((IP, PORTO))
         s.settimeout(5)
-    except:
+    else:
         print "Não foi possível conectar ao servidor"
         sys.exit(0)
     return s
@@ -45,18 +45,19 @@ def cria_socket_e_conecta(IP,PORTO):
 # Envia mensagem ao servidor requisitando numero de identificador
 # Saida: número de identificador, caso tenha sucesso
 def msg_OI(s):
-    s.send(struct.pack('!4H',3,0,65535,0))
-    idf = s.recv(8)
-    # Confere se mensagem de resposta foi recebida
+    s.send(struct.pack('!4H',3,0,65535,0)) # Envia requisião OI, se identificando ao servidor
+    idf = s.recv(8)                        # Recebe confirmação do servidor
+    # Confere se requisição foi obtida com sucesso:
     if not idf:
         print "O programa não pôde obter o número identificador com o servidor."
-        return 0
+        s.close
+        sys.exit(0)
     s_aux = struct.unpack('!4H',idf)
     idf =  int(s_aux[2])
     # Confere se recebeu um ok do servidor
     if s_aux[0] == 1:
         if idf == 0:
-            print "Cliente recebeu número de identificador igual ao do servidor"
+            print "ERRO!\nCliente recebeu número de identificador igual ao do servidor"
             s.close
             sys.exit(0)
         print "Identificador: " + str(idf)
@@ -82,9 +83,11 @@ def msg_MSG(msg, id_cliente, s, id_dest,num_seq):
         s_aux = s_aux + struct.pack('!B',ord(i))
     s.send(tipo_idf + tam + s_aux)
     try:
-        ok = struct.unpack('!4H',s.recv(8))
-    except:
-        print "Não foi possível obter a confirmação de recebimento com o servidor"
+        s.settimeout(5)
+        tipo, idf_org, idf_dst, num_seq_rec = struct.unpack('!4H',s.recv(8))
+        trata_ok(tipo,num_seq)
+    except socket.timeout:
+        print "Não foi possível obter a confirmação de recebimento com o servidor (tempo excessivo)"
         s.close
         sys.exit(0)
     return num_seq
@@ -98,8 +101,10 @@ def msg_FLW(id_cliente,s,id_dest,num_seq):
     tipo_idf = struct.pack('!4H', tipo, id_cliente, id_dest,num_seq)
     s.send(tipo_idf)
     try:
-        ok = struct.unpack('!4H',s.recv(8))
-    except:
+        s.settimeout(5)
+        tipo, idf_org, idf_dst, num_seq_rec = struct.unpack('!4H',s.recv(8))
+        trata_ok(tipo,num_seq)
+    except socket.timeout:
         print "Não foi possível obter a confirmação com o servidor"
         s.close
         sys.exit(0)
@@ -119,13 +124,17 @@ def msg_CREQ(idf,s,num_seq):
     buf = s.recv(10) # Recebe cabec + tamanho da lista de clientes
     if buf:
         tipo, idf_org, idf_dst, num_seq, tam_lista = struct.unpack('!5H',buf)
-        print "---------- LISTA DE CLIENTES ----------"
-        for i in range (tam_lista):
-            buf2 = struct.unpack('!H',s.recv(2))
-            print "Cliente " + str(buf2[0])
-        # Envia um ok para o servidor
-        s.send(struct.pack('!4H',1,idf,idf_serv,num_seq))
+        # Confere se recebeu mensagem tipo CLIST
+        if tipo != 7:
+            print "ERRO!\nPacote recebido de tipo diferente de CLIST."
+        else:
+            print "---------- LISTA DE CLIENTES ----------"
+            for i in range (tam_lista):
+                buf2 = struct.unpack('!H',s.recv(2))
+                print "Cliente " + str(buf2[0])
+                s.send(struct.pack('!4H',1,idf,idf_serv,num_seq)) # Envia um ok para o servidor
     else:
+        print "ERRO!\nNão foi possível receber a lista de clientes"
         # Envia uma mensagem de erro ao servidor
         s.send(struct.pack('!4H',2,idf,idf_serv,num_seq))
 
@@ -155,22 +164,19 @@ def recebe_MSG(data,s,id_proprio,idf_serv,num_seq):
     s.send(struct.pack('!4H',1,id_proprio,idf_serv,num_seq))
     print "\n" + str(id_remet) + " diz: " + mensagem
 
-# recebe_ok(socket com o servidor, número de sequência esperado)
+# trata_ok(identificador do tipo da msg recebida, número de sequência esperado)
 # Confere se recebeu um OK do servidor e se ele se trata do num. sequência esperado
 # Saida: ---//---
-def recebe_ok(s,num_seq):
-    tipo, idf_org, idf_dst, num_seq_rec, tam_lista = struct.unpack('!4H',s.recv(8))
+def trata_ok(tipo,num_seq):
     # Confere se recebeu erro
     if tipo == 1:
         return
     elif tipo == 2:
         print "Erro ao receber confirmação de recebimento de mensagem pelo servidor."
-        s.close
         sys.exit(0)
     # Confere se a confirmação recebida é relativa à mensagem de mesmo num. de sequência
     if num_seq_rec != num_seq:
         print "Confirmação recebida do servidor com número de sequência não esperado."
         print "Número de sequência recebido: " + num_seq_rec
         print "Número de sequência esperado: " + num_seq_rec
-        s.close
         sys.exit(0)
