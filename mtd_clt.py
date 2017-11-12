@@ -136,9 +136,7 @@ def msg_FLW(id_cliente,s,id_dest,num_seq):
         elif confirm == 2: # Recebeu um ERRO
             print "ERRO!\nNão foi possível encerrar a conexão. Tente novamente"
     except socket.timeout:
-        print "Não foi possível obter a confirmação com o servidor"
-        s.close
-        sys.exit(0)
+        print "ERRO!\nNão foi possível obter a confirmação com o servidor. Tente novamente"
 
 # msg_CREQ(identificador do cliente, socket ligado ao servidor)
 # Envia requisição para receber lista de clientes conectados ao servidor e os imprime na tela
@@ -161,7 +159,7 @@ def msg_CREQ(idf,s,num_seq):
             for i in range (tam_lista):
                 buf2 = struct.unpack('!H',s.recv(2))
                 print "Cliente " + str(buf2[0])
-                s.send(struct.pack('!4H',1,idf,idf_serv,num_seq)) # Envia um ok para o servidor
+            s.send(struct.pack('!4H',1,idf,idf_serv,num_seq)) # Envia um ok para o servidor
     else:
         print "ERRO!\nNão foi possível receber a lista de clientes"
         # Envia uma mensagem de erro ao servidor
